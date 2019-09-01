@@ -4,7 +4,7 @@ using System.Collections.Generic;
 namespace ILib.MVVM
 {
 
-	public class BindingPropertyCollection : IEnumerable<IBindingProperty>
+	public class BindingPropertyCollection 
 	{
 		Dictionary<string, BindingProperty> m_Properties = new Dictionary<string, BindingProperty>();
 
@@ -90,7 +90,7 @@ namespace ILib.MVVM
 			return property as BindingProperty<T>;
 		}
 
-		public IEnumerable<IBindingProperty> GetAll(string path)
+		public void SetDirty(string path)
 		{
 			BindingProperty property;
 			if (m_Properties.TryGetValue(path, out property))
@@ -99,35 +99,64 @@ namespace ILib.MVVM
 				{
 					if (property.IsValid)
 					{
-						yield return property;
+						property.SetDirty();
 					}
 					property = property.Next;
 				}
 			}
 		}
 
-		IEnumerator<IBindingProperty> IEnumerable<IBindingProperty>.GetEnumerator()
+		public void SetAllDirty()
 		{
-			foreach (var prop in m_Properties.Values)
+			foreach (var _property in m_Properties.Values)
 			{
-				if (prop.IsValid)
+				var property = _property;
+				while (property != null)
 				{
-					yield return prop;
+					if (property.IsValid)
+					{
+						property.SetDirty();
+					}
+					property = property.Next;
 				}
 			}
 		}
 
-		IEnumerator IEnumerable.GetEnumerator()
+		public void Bind(IBinding binding)
 		{
-			foreach (var prop in m_Properties.Values)
+			foreach (var _property in m_Properties.Values)
 			{
-				if (prop.IsValid)
+				var property = _property;
+				while (property != null)
 				{
-					yield return prop;
+					if (property.IsValid)
+					{
+						binding.Bind(property.Path, property);
+					}
+					property = property.Next;
 				}
-
 			}
 		}
+
+		public void Unbind(IBinding binding)
+		{
+			foreach (var _property in m_Properties.Values)
+			{
+				var property = _property;
+				while (property != null)
+				{
+					if (property.IsValid)
+					{
+						binding.Unbind(property.Path, property);
+					}
+					property = property.Next;
+				}
+			}
+		}
+
+#if UNITY_EDITOR
+		public IEnumerable<IBindingProperty> GetAll() => m_Properties.Values;
+#endif
 
 	}
 

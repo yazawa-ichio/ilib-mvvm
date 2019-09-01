@@ -26,8 +26,14 @@ namespace ILib.MVVM
 				{
 					m_Hash = m_Property.Hash;
 					m_UpdateLock = true;
-					UpdateValue(val);
-					m_UpdateLock = false;
+					try
+					{
+						UpdateValue(val);
+					}
+					finally
+					{
+						m_UpdateLock = false;
+					}
 				}
 			}
 		}

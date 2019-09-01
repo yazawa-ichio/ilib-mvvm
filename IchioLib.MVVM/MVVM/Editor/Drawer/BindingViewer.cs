@@ -11,13 +11,11 @@ namespace ILib.MVVM.Drawer
 	[System.Serializable]
 	public class BindingViewer
 	{
+		static string s_BindableListPrefKey = "ILIB.MVVM.Drawer-BindableList";
+		static string s_ViewModelPrefKey = "ILIB.MVVM.Drawer-ViewModel";
 
 		[SerializeField]
 		int m_Index;
-		[SerializeField]
-		bool m_BindingFoldOut = false;
-		[SerializeField]
-		bool m_ViewModelFoldOut = false;
 
 		View m_View;
 		SerializedObject m_Serialized;
@@ -153,8 +151,14 @@ namespace ILib.MVVM.Drawer
 
 		void DrawBindableList()
 		{
-			m_BindingFoldOut = EditorGUILayout.Foldout(m_BindingFoldOut, "Bindable List");
-			if (!m_BindingFoldOut)
+			var foldout = EditorPrefs.GetBool(s_BindableListPrefKey, true);
+			var ret = EditorGUILayout.Foldout(EditorPrefs.GetBool(s_BindableListPrefKey, true), "Bindable List");
+			if (foldout != ret)
+			{
+				foldout = ret;
+				EditorPrefs.SetBool(s_BindableListPrefKey, ret);
+			}
+			if (!foldout)
 			{
 				return;
 			}
@@ -176,8 +180,14 @@ namespace ILib.MVVM.Drawer
 
 		void DrawViewModel()
 		{
-			m_ViewModelFoldOut = EditorGUILayout.Foldout(m_ViewModelFoldOut, "ViewModel");
-			if (!m_ViewModelFoldOut)
+			var foldout = EditorPrefs.GetBool(s_ViewModelPrefKey, true);
+			var ret = EditorGUILayout.Foldout(foldout, "ViewModel");
+			if (ret != foldout)
+			{
+				foldout = ret;
+				EditorPrefs.SetBool(s_ViewModelPrefKey, ret);
+			}
+			if (!ret)
 			{
 				return;
 			}

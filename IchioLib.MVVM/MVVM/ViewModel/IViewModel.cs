@@ -15,7 +15,9 @@ namespace ILib.MVVM
 		void UnsubscribeViewEvent(string name, System.Action onViewEvent);
 		void SubscribeViewEvent<T>(string name, System.Action<T> onViewEvent);
 		void UnsubscribeViewEvent<T>(string name, System.Action<T> onViewEvent);
+#if UNITY_EDITOR
 		IEnumerable<IBindingProperty> GetProperties();
 		IEnumerable<IBindingEvent> GetEvents();
+#endif
 	}
 }

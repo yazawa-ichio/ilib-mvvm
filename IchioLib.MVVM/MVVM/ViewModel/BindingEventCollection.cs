@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 namespace ILib.MVVM
 {
-	public class BindingEventCollection : IViewEventHandler , IEnumerable<IBindingEvent>
+	public class BindingEventCollection : IViewEventHandler
 	{
 		Dictionary<string, BindingEventBase> m_Events = new Dictionary<string, BindingEventBase>(4);
 
@@ -97,7 +97,8 @@ namespace ILib.MVVM
 			Invoke(name, args);
 		}
 
-		IEnumerator<IBindingEvent> IEnumerable<IBindingEvent>.GetEnumerator()
+#if UNITY_EDITOR
+		public IEnumerable<IBindingEvent> GetAll()
 		{
 			foreach (var e in m_Events.Values)
 			{
@@ -108,17 +109,6 @@ namespace ILib.MVVM
 				} while ((cur = cur.Next) != null);
 			}
 		}
-
-		IEnumerator IEnumerable.GetEnumerator()
-		{
-			foreach (var e in m_Events.Values)
-			{
-				var cur = e;
-				do
-				{
-					yield return cur;
-				} while ((cur = cur.Next) != null);
-			}
-		}
+#endif       
 	}
 }

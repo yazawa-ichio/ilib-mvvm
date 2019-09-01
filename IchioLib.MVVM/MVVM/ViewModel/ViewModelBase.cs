@@ -36,37 +36,25 @@ namespace ILib.MVVM
 
 		public void SetDirty(string path)
 		{
-			foreach (var prop in m_Properties.GetAll(path))
-			{
-				prop.SetDirty();
-			}
+			m_Properties.SetDirty(path);
 		}
 
 		public void SetAllDirty()
 		{
-			foreach (var prop in m_Properties)
-			{
-				prop.SetDirty();
-			}
+			m_Properties.SetAllDirty();
 		}
 
 		void IViewModel.Register(IBinding binding)
 		{
 			m_Bindings.AddLast(binding);
-			foreach (var prop in m_Properties)
-			{
-				binding.Bind(prop.Path, prop);
-			}
+			m_Properties.Bind(binding);
 			binding.Bind(m_Events);
 		}
 
 		void IViewModel.Unregister(IBinding binding)
 		{
 			m_Bindings.Remove(binding);
-			foreach (var prop in m_Properties)
-			{
-				binding.Unbind(prop.Path, prop);
-			}
+			m_Properties.Unbind(binding);
 			binding.Unbind(m_Events);
 		}
 
@@ -108,15 +96,17 @@ namespace ILib.MVVM
 			m_Events.Remove(name, onViewEvent);
 		}
 
+#if UNITY_EDITOR
 		IEnumerable<IBindingProperty> IViewModel.GetProperties()
 		{
-			return m_Properties;
+			return m_Properties.GetAll();
 		}
 
 		IEnumerable<IBindingEvent> IViewModel.GetEvents()
 		{
-			return m_Events;
+			return m_Events.GetAll();
 		}
+#endif
 
 	}
 
