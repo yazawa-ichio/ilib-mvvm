@@ -45,6 +45,10 @@ namespace ILib.MVVM
 			m_VM.SetDirty(Path);
 		}
 
+		public static explicit operator T(ReactiveProperty<T> property)
+		{
+			return property.Value;
+		}
 
 	}
 

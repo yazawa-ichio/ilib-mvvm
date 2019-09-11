@@ -44,10 +44,17 @@ namespace ILib.MVVM.StaticVM
 			classEmitter.Extends.Add("ViewModelBase");
 
 			m_View.Prepare(true);
+
+			HashSet<string> path = new HashSet<string>();
+
 			foreach (var elm in m_View.Elements)
 			{
+				if (elm is EventButton)
+				{
+					continue;
+				}
 				var bindable = elm as IBindable;
-				if (bindable != null)
+				if (bindable != null && path.Add(bindable.Path))
 				{
 					if (m_Config.ReactivePropertyMode)
 					{
@@ -115,7 +122,7 @@ namespace ILib.MVVM.StaticVM
 		void PropertyEmit(IBindable bindable, List<MemberEmitter> ret)
 		{
 			PropertyEmitter property = new PropertyEmitter();
-			string name = bindable.Path.Replace("/", "");
+			string name = bindable.Path.Replace("/", "").Replace(".", "");
 			if (bindable is IViewEvent) name += m_Config.EventValueSuffix;
 			string type = GetTypeString(bindable.BindType());
 			property.Name = name;
@@ -129,7 +136,7 @@ namespace ILib.MVVM.StaticVM
 		void ReactivePropertyEmit(IBindable bindable, List<MemberEmitter> ret)
 		{
 			LazyPropertyEmitter property = new LazyPropertyEmitter();
-			string name = bindable.Path.Replace("/", "");
+			string name = bindable.Path.Replace("/", "").Replace(".", "");
 			if (bindable is IViewEvent) name += m_Config.EventValueSuffix;
 			
 			property.Name = name;
@@ -152,7 +159,7 @@ namespace ILib.MVVM.StaticVM
 
 		void CommandEmit(IViewEvent viewEvent, List<MemberEmitter> ret)
 		{
-			string name = viewEvent.Name.Replace("/", "");
+			string name = viewEvent.Name.Replace("/", "").Replace(".", "");
 			string genericType = (viewEvent.EventType() != null) ? $"<{GetTypeString(viewEvent.EventType())}>" : "";
 
 			FieldEmitter field = new FieldEmitter();
@@ -189,7 +196,7 @@ namespace ILib.MVVM.StaticVM
 
 		void EventEmit(IViewEvent viewEvent, List<MemberEmitter> ret)
 		{
-			string name = viewEvent.Name.Replace("/", "");
+			string name = viewEvent.Name.Replace("/", "").Replace(".", "");
 			string genericType = (viewEvent.EventType() != null) ? $"<{GetTypeString(viewEvent.EventType())}>" : "";
 
 			PropertyEmitter property = new PropertyEmitter();
@@ -202,7 +209,7 @@ namespace ILib.MVVM.StaticVM
 				w.WriteLine("add");
 				using (w.Bracket())
 				{
-					w.WriteLine($"(this as IViewModel).SubscribeViewEvent{genericType}(\"{viewEvent.Name}\", value);");
+					w.WriteLine($"SubscribeViewEvent{genericType}(\"{viewEvent.Name}\", value);");
 				}
 			});
 			property.Setter = new DelegateEmitter(w =>
@@ -210,7 +217,7 @@ namespace ILib.MVVM.StaticVM
 				w.WriteLine("remove");
 				using (w.Bracket())
 				{
-					w.WriteLine($"(this as IViewModel).UnsubscribeViewEvent{genericType}(\"{viewEvent.Name}\", value);");
+					w.WriteLine($"UnsubscribeViewEvent{genericType}(\"{viewEvent.Name}\", value);");
 				}
 			});
 			ret.Add(property);

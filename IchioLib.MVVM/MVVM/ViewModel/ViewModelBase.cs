@@ -66,32 +66,44 @@ namespace ILib.MVVM
 			}
 		}
 
-		void IViewModel.SubscribeChanged<T>(string path, Action<T> notify)
+		void IViewModel.SubscribeChanged<T>(string path, Action<T> notify) => SubscribeChanged(path, notify);
+
+		protected void SubscribeChanged<T>(string path, Action<T> notify)
 		{
 			m_Properties.Subscribe(path, notify);
 		}
 
-		void IViewModel.UnsubscribeChanged<T>(string path, Action<T> notify)
+		void IViewModel.UnsubscribeChanged<T>(string path, Action<T> notify) => UnsubscribeChanged(path, notify);
+
+		protected void UnsubscribeChanged<T>(string path, Action<T> notify)
 		{
 			m_Properties.Unsubscribe(path, notify);
 		}
 
-		void IViewModel.SubscribeViewEvent(string name, Action onViewEvent)
+		void IViewModel.SubscribeViewEvent(string name, Action onViewEvent) => SubscribeViewEvent(name, onViewEvent);
+
+		protected void SubscribeViewEvent(string name, Action onViewEvent)
 		{
 			m_Events.Add(name, onViewEvent);
 		}
 
-		void IViewModel.UnsubscribeViewEvent(string name, Action onViewEvent)
+		void IViewModel.UnsubscribeViewEvent(string name, Action onViewEvent) => UnsubscribeViewEvent(name, onViewEvent);
+
+		protected void UnsubscribeViewEvent(string name, Action onViewEvent)
 		{
 			m_Events.Remove(name, onViewEvent);
 		}
 
-		void IViewModel.SubscribeViewEvent<T>(string name, Action<T> onViewEvent)
+		void IViewModel.SubscribeViewEvent<T>(string name, Action<T> onViewEvent) => SubscribeViewEvent(name, onViewEvent);
+
+		protected void SubscribeViewEvent<T>(string name, Action<T> onViewEvent)
 		{
 			m_Events.Add(name, onViewEvent);
 		}
 
-		void IViewModel.UnsubscribeViewEvent<T>(string name, Action<T> onViewEvent)
+		void IViewModel.UnsubscribeViewEvent<T>(string name, Action<T> onViewEvent) => UnsubscribeViewEvent(name, onViewEvent);
+
+		protected void UnsubscribeViewEvent<T>(string name, Action<T> onViewEvent)
 		{
 			m_Events.Remove(name, onViewEvent);
 		}

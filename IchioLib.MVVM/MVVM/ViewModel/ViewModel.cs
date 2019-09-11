@@ -18,7 +18,7 @@ namespace ILib.MVVM
 			SetImpl(path, val);
 		}
 
-		public BindingCommand Command(string name, System.Action onViewEvent, System.Func<bool> canExecute = null)
+		public BindingCommand Command(string name, Action onViewEvent, Func<bool> canExecute = null)
 		{
 			var binding = new BindingCommand(name, this);
 			binding.Set(new DelegateCommand(onViewEvent, canExecute));
@@ -32,7 +32,7 @@ namespace ILib.MVVM
 			return binding;
 		}
 
-		public BindingCommand<T> Command<T>(string name, System.Action<T> onViewEvent, System.Func<bool> canExecute = null)
+		public BindingCommand<T> Command<T>(string name, Action<T> onViewEvent, Func<bool> canExecute = null)
 		{
 			var binding = new BindingCommand<T>(name, this);
 			binding.Set(new DelegateCommand<T>(onViewEvent, canExecute));
