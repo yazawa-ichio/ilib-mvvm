@@ -1,8 +1,8 @@
 {
   "name": "jp.yazawa-ichio.ilib-mvvm",
   "displayName":  "ILib.MVVM",
-  "version": "0.1.2",
-  "unity": "2018.3",
+  "version": "0.1.3",
+  "unity": "2018.4",
   "description": "Unity MVVM DataBinding Package.",
   "keywords": [ "mvvm" ],
   "Author": "yazawa-ichio (yazawa922473@gmail.com)",

@@ -3,15 +3,25 @@ using UnityEngine.UI;
 
 namespace ILib.MVVM
 {
-	public class ButtonBind : LightSimpleEventBind<bool, Button>
+	public class ButtonBind : LightEventBind<bool, Button>
 	{
+		EventArgument m_Aargument = default;
+
 		protected override void OnInit()
 		{
 			m_Target.onClick.AddListener(OnClick);
+			m_Aargument = m_Target.GetComponent<EventArgument>();
 		}
 		void OnClick()
 		{
-			Event();
+			if (m_Aargument != null)
+			{
+				Event(m_Aargument);
+			}
+			else
+			{
+				Event();
+			}
 		}
 
 		protected override void UpdateValue(bool val)
@@ -21,7 +31,7 @@ namespace ILib.MVVM
 
 		public override Type EventType()
 		{
-			return null;
+			return m_Aargument?.GetEventType() ?? null;
 		}
 	}
 

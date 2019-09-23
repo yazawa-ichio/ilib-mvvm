@@ -17,6 +17,7 @@ namespace ILib.MVVM
 			{
 				m_Target.text = val;
 			}
+			Event(val);
 		}
 
 		void OnEnd(string val)

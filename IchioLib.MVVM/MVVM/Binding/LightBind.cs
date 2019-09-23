@@ -119,13 +119,11 @@ namespace ILib.MVVM
 			m_Handler?.OnViewEvent(name, val);
 		}
 
+		protected void Event(EventArgument argument)
+		{
+			argument.Do(Path, m_Handler);
+		}
+
 	}
 
-	public abstract class LightSimpleEventBind<TValue, UTarget> : LightEventBind<TValue, UTarget> where UTarget : Object
-	{
-		public override Type EventType()
-		{
-			return null;
-		}
-	}
 }

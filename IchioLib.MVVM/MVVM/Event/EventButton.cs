@@ -14,7 +14,7 @@ namespace ILib.MVVM
 		string m_Event = default;
 		[SerializeField]
 		Button m_Button = default;
-		EventAargument m_Aargument = default;
+		EventArgument m_Aargument = default;
 
 		IViewEventHandler m_Handler;
 
@@ -24,7 +24,7 @@ namespace ILib.MVVM
 			{
 				m_Button = GetComponent<Button>();
 			}
-			m_Aargument = GetComponent<EventAargument>();
+			m_Aargument = GetComponent<EventArgument>();
 			m_Button.onClick.AddListener(OnClick);
 		}
 

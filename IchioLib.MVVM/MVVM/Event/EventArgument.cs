@@ -4,13 +4,13 @@ using UnityEngine;
 
 namespace ILib.MVVM
 {
-	public abstract class EventAargument : MonoBehaviour
+	public abstract class EventArgument : MonoBehaviour
 	{
 		public abstract System.Type GetEventType();
 		public abstract void Do(string name, IViewEventHandler handler);
 	}
 
-	public abstract class EventAargument<T> : EventAargument
+	public abstract class EventArgument<T> : EventArgument
 	{
 		public abstract T GetValue();
 

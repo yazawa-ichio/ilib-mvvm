@@ -6,7 +6,7 @@ using UnityEngine.UI;
 namespace ILib.MVVM
 {
 
-	public class InputFieldArgument : EventAargument<string>
+	public class InputFieldArgument : EventArgument<string>
 	{
 		[SerializeField]
 		InputField m_Target = default;

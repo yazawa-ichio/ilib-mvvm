@@ -2,7 +2,7 @@
 
 namespace ILib.MVVM
 {
-	public class ComponentEnabledArgument : EventAargument<bool>
+	public class ComponentEnabledArgument : EventArgument<bool>
 	{
 		[SerializeField]
 		MonoBehaviour m_Target = default;

@@ -3,7 +3,7 @@ using UnityEngine.UI;
 
 namespace ILib.MVVM
 {
-	public class TextArgument : EventAargument<string>
+	public class TextArgument : EventArgument<string>
 	{
 		[SerializeField]
 		Text m_Target = default;

@@ -3,7 +3,7 @@ using UnityEngine.UI;
 
 namespace ILib.MVVM
 {
-	public class GraphicColorArgument : EventAargument<Color>
+	public class GraphicColorArgument : EventArgument<Color>
 	{
 		[SerializeField]
 		Graphic m_Target = default;
