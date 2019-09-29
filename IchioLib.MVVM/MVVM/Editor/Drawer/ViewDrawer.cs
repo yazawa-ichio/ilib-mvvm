@@ -5,7 +5,7 @@ using UnityEditor;
 
 namespace ILib.MVVM.Drawer
 {
-	[CustomEditor(typeof(View))]
+	[CustomEditor(typeof(View), editorForChildClasses:true)]
 	public class ViewDrawer : Editor
 	{
 		static Dictionary<int, BindingViewer> m_Viewers = new Dictionary<int, BindingViewer>();

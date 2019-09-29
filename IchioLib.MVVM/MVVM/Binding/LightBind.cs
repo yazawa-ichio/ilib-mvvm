@@ -20,6 +20,15 @@ namespace ILib.MVVM
 		protected UTarget m_Target;
 		protected int m_Hash;
 
+		protected TValue Value
+		{
+			get
+			{
+				if (m_Property != null) return m_Property.Value;
+				return default;
+			}
+		}
+
 		public Type BindType()
 		{
 			return typeof(TValue);

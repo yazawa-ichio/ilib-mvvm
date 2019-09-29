@@ -65,6 +65,18 @@ namespace ILib.MVVM.Drawer
 			m_Elements = new HashSet<IViewElement>();
 			m_View.GetComponentsInChildren(true, m_TempElements);
 			m_Elements.UnionWith(m_TempElements);
+
+			foreach (var childView in m_View.GetComponentsInChildren<View>(true))
+			{
+				if (childView == m_View) continue;
+				m_TempElements.Clear();
+				childView.GetComponentsInChildren(true, m_TempElements);
+				foreach (var elm in m_TempElements)
+				{
+					m_Elements.Remove(elm);
+				}
+			}
+
 			m_TempElements.Clear();
 
 			m_ElementViewers.Clear();

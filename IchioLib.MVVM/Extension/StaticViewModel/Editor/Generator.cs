@@ -114,9 +114,9 @@ namespace ILib.MVVM.StaticVM
 			}
 			if (type.IsGenericType && typeof(IList<>).IsAssignableFrom(type.GetGenericTypeDefinition()))
 			{
-				return $"{type.GenericTypeArguments[0].FullName}[]";
+				return $"{type.GenericTypeArguments[0].FullName.Replace("+", ".")}[]";
 			}
-			return type.FullName;
+			return type.FullName.Replace("+", ".");
 		}
 
 		void PropertyEmit(IBindable bindable, List<MemberEmitter> ret)
