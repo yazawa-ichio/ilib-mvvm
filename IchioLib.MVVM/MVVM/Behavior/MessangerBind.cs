@@ -1,10 +1,12 @@
-﻿namespace ILib.MVVM.Behaviors
+﻿using System;
+
+namespace ILib.MVVM.Behaviors
 {
 	internal class MessangerBind : IBindable
 	{
 		int m_Hash;
-		System.WeakReference<Behavior> m_Behavior;
-		IBindingProperty m_Prop;
+		WeakReference<Behavior> m_Behavior;
+		IBindingProperty<Messenger> m_Prop;
 		public string Path { get; private set; }
 		public bool IsActive => m_Behavior != null;
 
@@ -14,16 +16,16 @@
 			Path = path;
 		}
 
-		public System.Type BindType()
+		public Type BindType()
 		{
-			return typeof(IMessenger);
+			return typeof(Messenger);
 		}
 
 		public void Bind(IBindingProperty prop)
 		{
-			if (prop.IsAssignable<IMessenger>())
+			if (prop is IBindingProperty<Messenger> target)
 			{
-				m_Prop = prop;
+				m_Prop = target;
 			}
 		}
 
@@ -42,10 +44,17 @@
 			Behavior behavior;
 			if (m_Behavior.TryGetTarget(out behavior))
 			{
-				behavior.SetMessanger(m_Prop.GetValue<IMessenger>() ?? Messenger.Default);
+				behavior.SetMessanger(m_Prop.Value ?? Messenger.Default);
 			}
 			return;
 		}
+
+
+		IConverter IBindable.GetConverter()
+		{
+			return null;
+		}
+
 	}
 
 }

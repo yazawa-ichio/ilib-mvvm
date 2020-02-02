@@ -8,7 +8,6 @@ namespace ILib.MVVM
 	internal class BindingEventBase : IBindingEvent
 	{
 		public string Name { get; private set; }
-		internal BindingEventBase Next;
 		public BindingEventBase(string name)
 		{
 			Name = name;
@@ -25,8 +24,11 @@ namespace ILib.MVVM
 		}
 		public override string ToString()
 		{
-			var target = OnEvent?.Target ?? null;
-			return $"{target}";
+			if (OnEvent == null)
+			{
+				return "Empty";
+			}
+			return $"{OnEvent.Method}:({OnEvent.Target})";
 		}
 	}
 
@@ -41,9 +43,8 @@ namespace ILib.MVVM
 		public override string ToString()
 		{
 			var target = OnEvent?.Target ?? null;
-			return $"{target}";
+			return $"{OnEvent.Method}:({OnEvent.Target})";
 		}
-
 	}
 
 }

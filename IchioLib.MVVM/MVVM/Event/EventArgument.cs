@@ -7,7 +7,8 @@ namespace ILib.MVVM
 	public abstract class EventArgument : MonoBehaviour
 	{
 		public abstract System.Type GetEventType();
-		public abstract void Do(string name, IViewEventHandler handler);
+		public abstract void Do(string name, IViewEventDispatcher handler);
+		public abstract void Do(string name, Messenger messenger);
 	}
 
 	public abstract class EventArgument<T> : EventArgument
@@ -16,9 +17,14 @@ namespace ILib.MVVM
 
 		public override System.Type GetEventType() => typeof(T);
 
-		public override void Do(string name, IViewEventHandler handler)
+		public override void Do(string name, IViewEventDispatcher handler)
 		{
-			handler?.OnViewEvent<T>(name, GetValue());
+			handler?.Dispatch<T>(name, GetValue());
+		}
+
+		public override void Do(string name, Messenger messenger)
+		{
+			messenger?.Send<T>(name, GetValue());
 		}
 
 	}

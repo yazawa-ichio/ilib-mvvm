@@ -17,7 +17,7 @@
 		{
 			Name = name;
 			m_VM = vm;
-			m_VM.SubscribeViewEvent(name, Execute);
+			m_VM.Event.Subscribe(name, Execute);
 		}
 
 		public ICommand Get()
@@ -42,9 +42,14 @@
 		{
 			if (m_VM != null)
 			{
-				m_VM.UnsubscribeViewEvent(Name, Execute);
+				m_VM.Event.Unsubscribe(Name, Execute);
 				m_VM = null;
 			}
+		}
+
+		public override string ToString()
+		{
+			return m_Value?.ToString() ?? "Empty";
 		}
 
 	}
@@ -66,7 +71,7 @@
 		{
 			Name = name;
 			m_VM = vm;
-			m_VM.SubscribeViewEvent<T>(name, Execute);
+			m_VM.Event.Subscribe<T>(name, Execute);
 		}
 
 		public ICommand<T> Get()
@@ -91,10 +96,16 @@
 		{
 			if (m_VM != null)
 			{
-				m_VM.UnsubscribeViewEvent<T>(Name, Execute);
+				m_VM.Event.Subscribe<T>(Name, Execute);
 				m_VM = null;
 			}
 		}
+
+		public override string ToString()
+		{
+			return m_Value?.ToString() ?? "Empty";
+		}
+
 	}
 
 }

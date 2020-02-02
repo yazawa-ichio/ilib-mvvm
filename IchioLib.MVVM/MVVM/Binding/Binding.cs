@@ -1,23 +1,18 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using UnityEngine;
 
 namespace ILib.MVVM
 {
 
-	public class Binding : IBinding, IMultipleBindable
+	public class Binding : IDisposable, IMultipleBindable, IViewEventDispatcher
 	{
-		class BindData
-		{
-			public IBindable Bind;
-			public BindData Next;
-		}
-
 		IViewElement[] m_Elements;
-		IBindable[] m_Binding = System.Array.Empty<IBindable>();
-		Dictionary<string, BindData> m_BindData = new Dictionary<string, BindData>();
-		BindingEventHandler m_ViewEventHandler = new BindingEventHandler();
+		IBindable[] m_Binding = Array.Empty<IBindable>();
+		int m_BindingCount = 0;
+		List<IViewModel> m_ViewModels = new List<IViewModel>();
+		bool m_Disposed;
 
 		void IMultipleBindable.OnPrepare() { }
 
@@ -53,84 +48,113 @@ namespace ILib.MVVM
 			foreach (var elm in elements)
 			{
 				//イベントであれば登録
-				(elm as IViewEvent)?.Bind(m_ViewEventHandler);
+				(elm as IViewEvent)?.Bind(this);
 			}
-			m_BindData.Clear();
 			m_Binding = GetBindables().ToArray();
-			foreach (var bind in m_Binding)
-			{
-				//binderをパスごとに連結
-				BindData data;
-				if (!m_BindData.TryGetValue(bind.Path, out data))
-				{
-					m_BindData[bind.Path] = data = new BindData();
-				}
-				else
-				{
-					var cur = data;
-					while (cur.Next != null)
-					{
-						cur = cur.Next;
-					}
-					cur.Next = data = new BindData();
-				}
-				data.Bind = bind;
-			}
+			m_BindingCount = m_Binding.Length;
 		}
 
 		public void TryUpdate()
 		{
-			//いったん面倒なのでnull突っ込む
-			//本当は前詰めにすべき
-			for (int i = 0; i < m_Binding.Length; i++)
+			if (m_Disposed) return;
+			for (int i = 0; i < m_BindingCount; i++)
 			{
 				IBindable bind = m_Binding[i];
-				if (bind == null) continue;
 				if (bind.IsActive)
 				{
 					bind.TryUpdate();
 				}
 				else
 				{
-					m_Binding[i] = null;
+					//左詰めする
+					LeftShiftBindingArray(i);
 				}
 			}
 		}
 
-		public void Bind(string path, IBindingProperty prop)
+		void LeftShiftBindingArray(int index)
 		{
-			BindData data;
-			if (m_BindData.TryGetValue(path, out data))
+			m_BindingCount--;
+			for (int i = index; i < m_BindingCount; i++)
 			{
-				var cur = data;
-				do
+				m_Binding[i] = m_Binding[i + 1];
+			}
+			m_Binding[m_BindingCount - 1] = null;
+		}
+
+		public void Bind(IViewModel model)
+		{
+			if (m_Disposed) return;
+			m_ViewModels.Add(model);
+			foreach (var prop in model.Property.GetAll())
+			{
+				Bind(prop.Path, prop);
+			}
+			model.Property.OnNewProperty += Bind;
+		}
+
+		public void Unbind(IViewModel model)
+		{
+			if (m_Disposed) return;
+			m_ViewModels.Remove(model);
+			foreach (var prop in model.Property.GetAll())
+			{
+				Unbind(prop.Path, prop);
+			}
+			model.Property.OnNewProperty -= Bind;
+		}
+
+		void Bind(string path, IBindingProperty prop)
+		{
+			if (m_Disposed) return;
+			for (int i = 0; i < m_BindingCount; i++)
+			{
+				IBindable bind = m_Binding[i];
+				if (bind.Path == path && bind.IsActive)
 				{
-					cur.Bind.Bind(prop);
-				} while ((cur = cur.Next) != null);
+					bind.Bind(prop);
+				}
 			}
 		}
 
-		public void Unbind(string path, IBindingProperty prop)
+		void Unbind(string path, IBindingProperty prop)
 		{
-			BindData data;
-			if (m_BindData.TryGetValue(path, out data))
+			if (m_Disposed) return;
+			for (int i = 0; i < m_BindingCount; i++)
 			{
-				var cur = data;
-				do
+				IBindable bind = m_Binding[i];
+				if (bind.Path == path && bind.IsActive)
 				{
-					cur.Bind.Unbind(prop);
-				} while ((cur = cur.Next) != null);
+					bind.Unbind(prop);
+				}
 			}
 		}
 
-		public void Bind(IViewEventHandler handler)
+		void IViewEventDispatcher.Dispatch(string name)
 		{
-			m_ViewEventHandler.Add(handler);
+			if (m_Disposed) return;
+			foreach (var vm in m_ViewModels)
+			{
+				vm.Event.Publish(name);
+			}
 		}
 
-		public void Unbind(IViewEventHandler handler)
+		void IViewEventDispatcher.Dispatch<T>(string name, T args)
 		{
-			m_ViewEventHandler.Remove(handler);
+			if (m_Disposed) return;
+			foreach (var vm in m_ViewModels)
+			{
+				vm.Event.Publish(name, args);
+			}
+		}
+
+		public void Dispose()
+		{
+			m_Disposed = true;
+			for (int i = m_ViewModels.Count - 1; i >= 0; i--)
+			{
+				Unbind(m_ViewModels[i]);
+			}
 		}
 
 	}

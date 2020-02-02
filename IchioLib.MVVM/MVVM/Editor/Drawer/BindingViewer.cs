@@ -213,7 +213,7 @@ namespace ILib.MVVM.Drawer
 			{
 				EditorGUILayout.LabelField("Property Path(Type)", "Value");
 				GUILayout.Box("", GUILayout.ExpandWidth(true), GUILayout.Height(1));
-				foreach (var prop in vm.GetProperties())
+				foreach (var prop in vm.Property.GetAll())
 				{
 					EditorGUILayout.LabelField($"{prop.Path}({prop.GetBindType().Name})", prop.ToString());
 				}
@@ -223,7 +223,7 @@ namespace ILib.MVVM.Drawer
 			{
 				EditorGUILayout.LabelField("Event Name", "Target");
 				GUILayout.Box("", GUILayout.ExpandWidth(true), GUILayout.Height(1));
-				foreach (var e in vm.GetEvents())
+				foreach (var e in vm.Event.GetAll())
 				{
 					EditorGUILayout.LabelField(e.Name, e.ToString());
 				}

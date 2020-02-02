@@ -9,4 +9,6 @@ ViewModelのデータを反映するバインダーは独自に実装するこ�
 また、オプションを持たない指定のコンポートに対しての単一パラメータのバインディングを行う場合、LightBindという軽量のバインダーを利用できます。  
 ViewModelは汎用的に値をセットできるSet/Get関数を利用するものと、プレハブに設定してあるバインダーのパスから自動生成で静的なViewModelを利用するものもあります。  
 
-気が向いたらドキュメントを描くかもしれません。  
+## [ドキュメント](https://yazawa-ichio.github.io/ilib-unity-project/manual/ilib-mvvm/index.html)
+
+## [APIリファレンス](https://yazawa-ichio.github.io/ilib-unity-project/api/index.html)

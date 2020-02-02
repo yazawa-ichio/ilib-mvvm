@@ -19,7 +19,7 @@ namespace ILib.MVVM
 		{
 			Path = path;
 			m_VM = vm;
-			m_VM.SubscribeChanged<T>(Path, OnNotifyChanged);
+			m_VM.Property.Subscribe<T>(Path, OnNotifyChanged);
 		}
 
 		public ReactiveProperty(string path, IViewModel vm, T val)
@@ -27,7 +27,7 @@ namespace ILib.MVVM
 			Path = path;
 			m_VM = vm;
 			Value = val;
-			m_VM.SubscribeChanged<T>(Path, OnNotifyChanged);
+			m_VM.Property.Subscribe<T>(Path, OnNotifyChanged);
 		}
 
 		void OnNotifyChanged(T val)
@@ -37,7 +37,8 @@ namespace ILib.MVVM
 
 		public void Dispose()
 		{
-			m_VM.UnsubscribeChanged<T>(Path, OnNotifyChanged);
+			OnChanged = null;
+			m_VM.Property.Unsubscribe<T>(Path, OnNotifyChanged);
 		}
 
 		public void SetDirty()

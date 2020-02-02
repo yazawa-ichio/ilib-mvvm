@@ -19,5 +19,4 @@ namespace ILib.MVVM
 			m_Val = val;
 		}
 	}
-
 }

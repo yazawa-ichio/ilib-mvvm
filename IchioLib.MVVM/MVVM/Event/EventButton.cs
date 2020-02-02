@@ -16,10 +16,18 @@ namespace ILib.MVVM
 		Button m_Button = default;
 		EventArgument m_Aargument = default;
 
-		IViewEventHandler m_Handler;
+		IViewEventDispatcher m_Handler;
+		bool m_Init;
 
 		void Awake()
 		{
+			Init();
+		}
+
+		void Init()
+		{
+			if (m_Init) return;
+			m_Init = true;
 			if (m_Button == null)
 			{
 				m_Button = GetComponent<Button>();
@@ -36,11 +44,11 @@ namespace ILib.MVVM
 			}
 			else
 			{
-				m_Handler?.OnViewEvent(Name);
+				m_Handler?.Dispatch(Name);
 			}
 		}
 
-		void IViewEvent.Bind(IViewEventHandler handler)
+		void IViewEvent.Bind(IViewEventDispatcher handler)
 		{
 			m_Handler = handler;
 		}
@@ -48,6 +56,12 @@ namespace ILib.MVVM
 		public virtual System.Type EventType()
 		{
 			return m_Aargument?.GetEventType() ?? null;
+		}
+
+		public EventArgument GetArgument()
+		{
+			Init();
+			return m_Aargument;
 		}
 
 	}

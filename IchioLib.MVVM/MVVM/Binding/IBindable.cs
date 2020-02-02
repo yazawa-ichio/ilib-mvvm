@@ -10,13 +10,14 @@ namespace ILib.MVVM
 		bool IsActive { get; }
 		void TryUpdate();
 		System.Type BindType();
+		IConverter GetConverter();
 		void Bind(IBindingProperty prop);
 		void Unbind(IBindingProperty prop);
 	}
 
 	public interface IBindable<T> : IBindable
 	{
-		void Bind(IBindingProperty<T> prop);
+		//void Bind(IBindingProperty<T> prop);
 	}
 
 }

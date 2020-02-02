@@ -1,8 +1,9 @@
-﻿using System.Collections.Generic;
+﻿using System.Collections;
+using System.Collections.Generic;
 
 namespace ILib.MVVM
 {
-	public class ReactiveListProperty<T> : System.IDisposable
+	public class ReactiveListProperty<T> : IList<T>, System.IDisposable
 	{
 		public readonly string Path;
 		IViewModel m_VM;
@@ -23,14 +24,17 @@ namespace ILib.MVVM
 			set { m_VM.Set<List<T>>(Path, value); m_List = value; }
 		}
 
-		public event System.Action<List<T>> OnChanged;
+		public int Count => m_List?.Count ?? 0;
 
+		bool ICollection<T>.IsReadOnly => false;
+
+		public event System.Action<List<T>> OnChanged;
 
 		public ReactiveListProperty(string path, IViewModel vm)
 		{
 			Path = path;
 			m_VM = vm;
-			m_VM.SubscribeChanged<List<T>>(Path, OnNotifyChanged);
+			m_VM.Property.Subscribe<List<T>>(Path, OnNotifyChanged);
 		}
 
 		public ReactiveListProperty(string path, IViewModel vm, List<T> val)
@@ -38,7 +42,7 @@ namespace ILib.MVVM
 			Path = path;
 			m_VM = vm;
 			Value = val;
-			m_VM.SubscribeChanged<List<T>>(Path, OnNotifyChanged);
+			m_VM.Property.Subscribe<List<T>>(Path, OnNotifyChanged);
 
 		}
 
@@ -49,7 +53,8 @@ namespace ILib.MVVM
 
 		public void Dispose()
 		{
-			m_VM.UnsubscribeChanged<List<T>>(Path, OnNotifyChanged);
+			OnChanged = null;
+			m_VM.Property.Unsubscribe<List<T>>(Path, OnNotifyChanged);
 		}
 
 		public void SetDirty()
@@ -78,12 +83,14 @@ namespace ILib.MVVM
 			SetDirty();
 		}
 
-		public void Remove(T val)
+		public bool Remove(T val)
 		{
 			if (m_List != null && m_List.Remove(val))
 			{
 				SetDirty();
+				return true;
 			}
+			return false;
 		}
 
 		public void Clear()
@@ -112,7 +119,43 @@ namespace ILib.MVVM
 			}
 		}
 
+		public int IndexOf(T item)
+		{
+			return m_List?.IndexOf(item) ?? -1;
+		}
 
+		public void Insert(int index, T item)
+		{
+			m_List?.Insert(index, item);
+			SetDirty();
+		}
+
+		public void RemoveAt(int index)
+		{
+			m_List?.RemoveAt(index);
+			SetDirty();
+		}
+
+		public bool Contains(T item)
+		{
+			return m_List?.Contains(item) ?? false;
+		}
+
+		public void CopyTo(T[] array, int arrayIndex)
+		{
+			GetList().CopyTo(array, arrayIndex);
+			SetDirty();
+		}
+
+		IEnumerator<T> IEnumerable<T>.GetEnumerator()
+		{
+			return GetList() as IEnumerator<T>;
+		}
+
+		IEnumerator IEnumerable.GetEnumerator()
+		{
+			return GetList() as IEnumerator;
+		}
 
 	}
 

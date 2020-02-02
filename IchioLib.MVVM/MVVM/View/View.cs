@@ -27,6 +27,13 @@ namespace ILib.MVVM
 			Init();
 		}
 
+		private void OnDestroy()
+		{
+			m_Binding?.Dispose();
+			m_Binding = null;
+			OnDestroyImpl();
+		}
+
 		public void Prepare(bool force = false)
 		{
 			if (m_Prepare && !force) return;
@@ -51,18 +58,14 @@ namespace ILib.MVVM
 			m_Elements = elements.ToArray();
 		}
 
-		private void OnDestroy()
-		{
-			m_ViewModel?.Unregister(m_Binding);
-			m_ViewModel = null;
-		}
-
 		private void Update()
 		{
 			TryUpdate();
 		}
 
-		public void TryUpdate()
+		protected virtual void OnDestroyImpl() { }
+
+		public virtual void TryUpdate()
 		{
 			m_Binding.TryUpdate();
 		}
@@ -82,9 +85,12 @@ namespace ILib.MVVM
 
 		public void Attach(IViewModel vm)
 		{
-			m_ViewModel?.Unregister(m_Binding);
+			if (m_ViewModel != null)
+			{
+				m_Binding.Unbind(m_ViewModel);
+			}
 			m_ViewModel = vm;
-			m_ViewModel.Register(m_Binding);
+			m_Binding.Bind(vm);
 		}
 
 	}

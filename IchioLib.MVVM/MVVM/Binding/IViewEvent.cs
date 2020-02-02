@@ -4,6 +4,7 @@
 	{
 		string Name { get; }
 		System.Type EventType();
-		void Bind(IViewEventHandler handler);
+		void Bind(IViewEventDispatcher handler);
+		EventArgument GetArgument();
 	}
 }

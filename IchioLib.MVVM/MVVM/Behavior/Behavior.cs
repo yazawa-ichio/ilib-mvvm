@@ -11,13 +11,13 @@ namespace ILib.MVVM
 	{
 
 		[SerializeField]
-		string m_MessangerPath = "Messanger";
+		string m_MessangerPath = ViewModelBase.MessengerPath;
 
 		public string MessangerPath => m_MessangerPath;
 
-		IMessenger m_Messanger = Messenger.Default;
-		IMessenger IBehavior.Messanger => m_Messanger;
-		Action<IMessenger> m_OnSetMessanger = null;
+		protected Messenger m_Messanger = Messenger.Default;
+		Messenger IBehavior.Messanger => m_Messanger;
+		Action<Messenger> m_OnSetMessanger = null;
 
 		void OnDestroy()
 		{
@@ -36,7 +36,7 @@ namespace ILib.MVVM
 			m_OnSetMessanger += (msg) => msg.Register(this, name, action);
 		}
 
-		internal void SetMessanger(IMessenger messenger)
+		internal void SetMessanger(Messenger messenger)
 		{
 			m_Messanger?.Unregister(this);
 			m_Messanger = messenger;

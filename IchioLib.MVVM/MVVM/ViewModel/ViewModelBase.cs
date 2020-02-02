@@ -5,33 +5,34 @@ namespace ILib.MVVM
 {
 	public abstract class ViewModelBase : IViewModel
 	{
-		LinkedList<IBinding> m_Bindings = new LinkedList<IBinding>();
+		public const string MessengerPath = "Messanger";
 
-		BindingPropertyCollection m_Properties = new BindingPropertyCollection();
-		BindingEventCollection m_Events = new BindingEventCollection();
+		protected BindingPropertyCollection m_Properties = new BindingPropertyCollection();
 
-		public IMessenger Messenger
+		BindingPropertyCollection IViewModel.Property => m_Properties;
+
+		protected EventBroker m_Event = new EventBroker();
+
+		public EventBroker Event => m_Event;
+
+		public Messenger Messenger
 		{
-			get { return GetImpl<IMessenger>("Messanger") ?? ILib.MVVM.Messenger.Default; }
-			set { SetImpl("Messanger", value); }
+			get { return GetImpl<Messenger>(MessengerPath) ?? ILib.MVVM.Messenger.Default; }
+			set { SetImpl(MessengerPath, value); }
 		}
 
 		T IViewModel.Get<T>(string path) => GetImpl<T>(path);
 
 		protected T GetImpl<T>(string path)
 		{
-			return m_Properties.Get<T>(path);
+			return m_Properties.Get<T>(path).Value;
 		}
 
 		void IViewModel.Set<T>(string path, T val) => SetImpl<T>(path, val);
 
 		protected void SetImpl<T>(string path, T val)
 		{
-			IBindingProperty<T> newProperty;
-			if (m_Properties.Set(path, val, out newProperty))
-			{
-				BindNewProperty(path, newProperty);
-			}
+			m_Properties.Get<T>(path).Value = val;
 		}
 
 		public void SetDirty(string path)
@@ -43,82 +44,6 @@ namespace ILib.MVVM
 		{
 			m_Properties.SetAllDirty();
 		}
-
-		void IViewModel.Register(IBinding binding)
-		{
-			m_Bindings.AddLast(binding);
-			m_Properties.Bind(binding);
-			binding.Bind(m_Events);
-		}
-
-		void IViewModel.Unregister(IBinding binding)
-		{
-			m_Bindings.Remove(binding);
-			m_Properties.Unbind(binding);
-			binding.Unbind(m_Events);
-		}
-
-		void BindNewProperty(string path, IBindingProperty property)
-		{
-			foreach (var binding in m_Bindings)
-			{
-				binding.Bind(path, property);
-			}
-		}
-
-		void IViewModel.SubscribeChanged<T>(string path, Action<T> notify) => SubscribeChanged(path, notify);
-
-		protected void SubscribeChanged<T>(string path, Action<T> notify)
-		{
-			m_Properties.Subscribe(path, notify);
-		}
-
-		void IViewModel.UnsubscribeChanged<T>(string path, Action<T> notify) => UnsubscribeChanged(path, notify);
-
-		protected void UnsubscribeChanged<T>(string path, Action<T> notify)
-		{
-			m_Properties.Unsubscribe(path, notify);
-		}
-
-		void IViewModel.SubscribeViewEvent(string name, Action onViewEvent) => SubscribeViewEvent(name, onViewEvent);
-
-		protected void SubscribeViewEvent(string name, Action onViewEvent)
-		{
-			m_Events.Add(name, onViewEvent);
-		}
-
-		void IViewModel.UnsubscribeViewEvent(string name, Action onViewEvent) => UnsubscribeViewEvent(name, onViewEvent);
-
-		protected void UnsubscribeViewEvent(string name, Action onViewEvent)
-		{
-			m_Events.Remove(name, onViewEvent);
-		}
-
-		void IViewModel.SubscribeViewEvent<T>(string name, Action<T> onViewEvent) => SubscribeViewEvent(name, onViewEvent);
-
-		protected void SubscribeViewEvent<T>(string name, Action<T> onViewEvent)
-		{
-			m_Events.Add(name, onViewEvent);
-		}
-
-		void IViewModel.UnsubscribeViewEvent<T>(string name, Action<T> onViewEvent) => UnsubscribeViewEvent(name, onViewEvent);
-
-		protected void UnsubscribeViewEvent<T>(string name, Action<T> onViewEvent)
-		{
-			m_Events.Remove(name, onViewEvent);
-		}
-
-#if UNITY_EDITOR
-		IEnumerable<IBindingProperty> IViewModel.GetProperties()
-		{
-			return m_Properties.GetAll();
-		}
-
-		IEnumerable<IBindingEvent> IViewModel.GetEvents()
-		{
-			return m_Events.GetAll();
-		}
-#endif
 
 	}
 

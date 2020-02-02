@@ -16,19 +16,29 @@ namespace ILib.MVVM
 
 		IBindingProperty m_Property;
 		protected int m_Hash;
+		IConverter m_Converter;
+		bool m_CheckConverter;
 
 		public System.Type BindType()
 		{
-			return typeof(IViewModel);
+			return GetConverter()?.GetTargetType() ?? typeof(IViewModel);
 		}
 
-		void IBindable<IViewModel>.Bind(IBindingProperty<IViewModel> prop)
+		public IConverter GetConverter()
 		{
-			m_Property = prop;
+			if (m_CheckConverter) return m_Converter;
+			m_CheckConverter = true;
+			return m_Converter = GetComponent<IConverter>();
 		}
 
 		void IBindable.Bind(IBindingProperty prop)
 		{
+			IBindingProperty ret = null;
+			if (m_Converter.TryConvert(prop, ref ret) && ret.IsAssignable<IViewModel>())
+			{
+				m_Property = ret;
+				return;
+			}
 			if (prop.IsAssignable<IViewModel>())
 			{
 				m_Property = prop;
@@ -37,6 +47,11 @@ namespace ILib.MVVM
 
 		void IBindable.Unbind(IBindingProperty prop)
 		{
+			if (m_Converter != null && m_Converter.Unbind(prop))
+			{
+				m_Property = null;
+				OnUnbind();
+			}
 			if (m_Property == prop)
 			{
 				m_Property = null;
@@ -48,6 +63,7 @@ namespace ILib.MVVM
 
 		void IBindable.TryUpdate()
 		{
+			m_Converter?.TryUpdate();
 			if (m_Property == null || m_Property.Hash == m_Hash) return;
 			m_Hash = m_Property.Hash;
 			Attach(m_Property.GetValue<IViewModel>());

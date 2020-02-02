@@ -6,11 +6,13 @@ using Object = UnityEngine.Object;
 
 namespace ILib.MVVM
 {
+	[UnityEngine.Scripting.Preserve]
 	public interface ILightBind
 	{
 		void Init(Object obj, string path);
 	}
 
+	[UnityEngine.Scripting.Preserve]
 	public abstract class LightBind<TValue, UTarget> : ILightBind, IBindable<TValue> where UTarget : Object
 	{
 		public string Path { get; private set; }
@@ -19,6 +21,8 @@ namespace ILib.MVVM
 		IBindingProperty<TValue> m_Property;
 		protected UTarget m_Target;
 		protected int m_Hash;
+		protected bool m_ForceUpdate;
+		protected IConverter m_Converter;
 
 		protected TValue Value
 		{
@@ -31,51 +35,52 @@ namespace ILib.MVVM
 
 		public Type BindType()
 		{
-			return typeof(TValue);
+			return GetConverter()?.GetTargetType() ?? typeof(TValue);
 		}
 
-		bool m_UpdateLock = false;
-
-		protected void Set(TValue val, bool update = false)
+		protected void Set(TValue val)
 		{
-			if (m_UpdateLock) return;
 			if (m_Property != null)
 			{
 				m_Property.Value = val;
-				if (update)
-				{
-					m_Hash = m_Property.Hash;
-					m_UpdateLock = true;
-					UpdateValue(val);
-					m_UpdateLock = false;
-				}
 			}
 		}
 
 		public void Init(Object obj, string path)
 		{
 			m_Target = (UTarget)obj;
+			m_Converter = (m_Target as Component)?.GetComponent<IConverter>() ?? null;
 			Path = path;
 			OnInit();
+		}
+
+		public IConverter GetConverter()
+		{
+			return m_Converter;
 		}
 
 		protected virtual void OnInit() { }
 
 		void IBindable.Bind(IBindingProperty prop)
 		{
+			if (m_Converter != null && m_Converter.TryConvert(prop, ref m_Property))
+			{
+				m_ForceUpdate = true;
+				return;
+			}
 			if (prop is IBindingProperty<TValue>)
 			{
 				m_Property = (IBindingProperty<TValue>)prop;
 			}
 		}
 
-		void IBindable<TValue>.Bind(IBindingProperty<TValue> prop)
-		{
-			m_Property = prop;
-		}
-
 		void IBindable.Unbind(IBindingProperty prop)
 		{
+			if (m_Converter != null && m_Converter.Unbind(prop))
+			{
+				m_Property = null;
+				OnUnbind();
+			}
 			if (m_Property == prop)
 			{
 				m_Property = null;
@@ -87,24 +92,33 @@ namespace ILib.MVVM
 
 		void IBindable.TryUpdate()
 		{
-			if (m_Property == null || m_Property.Hash == m_Hash) return;
+			TryUpdate();
+		}
+
+		protected void TryUpdate()
+		{
+			m_Converter?.TryUpdate();
+			if (m_Property == null || (!m_ForceUpdate && m_Property.Hash == m_Hash))
+			{
+				return;
+			}
+			m_ForceUpdate = false;
 			m_Hash = m_Property.Hash;
 			UpdateValue(m_Property.Value);
-			return;
 		}
 
 		protected abstract void UpdateValue(TValue val);
 
-
 	}
 
+	[UnityEngine.Scripting.Preserve]
 	public abstract class LightEventBind<TValue, UTarget> : LightBind<TValue, UTarget>, IViewEvent where UTarget : Object
 	{
 		string IViewEvent.Name => Path;
 
-		IViewEventHandler m_Handler;
+		IViewEventDispatcher m_Handler;
 
-		void IViewEvent.Bind(IViewEventHandler handler)
+		void IViewEvent.Bind(IViewEventDispatcher handler)
 		{
 			m_Handler = handler;
 		}
@@ -118,14 +132,14 @@ namespace ILib.MVVM
 
 		protected void Event(string name)
 		{
-			m_Handler?.OnViewEvent(name);
+			m_Handler?.Dispatch(name);
 		}
 
 		protected void Event(TValue val) => Event(Path, val);
 
 		protected void Event<T>(string name, T val)
 		{
-			m_Handler?.OnViewEvent(name, val);
+			m_Handler?.Dispatch(name, val);
 		}
 
 		protected void Event(EventArgument argument)
@@ -133,6 +147,7 @@ namespace ILib.MVVM
 			argument.Do(Path, m_Handler);
 		}
 
+		public virtual EventArgument GetArgument() { return null; }
 	}
 
 }

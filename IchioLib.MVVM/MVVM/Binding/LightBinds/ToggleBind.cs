@@ -5,6 +5,7 @@ using UnityEngine.UI;
 
 namespace ILib.MVVM
 {
+	[UnityEngine.Scripting.Preserve]
 	public class ToggleBind : LightBind<bool, Toggle>
 	{
 		protected override void OnInit()

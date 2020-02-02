@@ -8,12 +8,11 @@ namespace ILib.MVVM
 	{
 		public string Path { get; private set; }
 		public int Hash { get; protected set; }
-		internal bool IsValid = false;
 		internal BindingProperty Next;
 		public BindingProperty(string path)
 		{
 			Path = path;
-			Hash = GetHashCode() ^ path.GetHashCode();
+			Hash = 1;
 		}
 
 		public abstract Type GetBindType();
@@ -45,7 +44,8 @@ namespace ILib.MVVM
 			}
 		}
 
-		public BindingProperty(string path, TValue val) : base(path) { m_Value = val; }
+		public BindingProperty(string path) : base(path) { m_Value = default; }
+
 		public event Action<TValue> OnChanged;
 
 		public override Type GetBindType()

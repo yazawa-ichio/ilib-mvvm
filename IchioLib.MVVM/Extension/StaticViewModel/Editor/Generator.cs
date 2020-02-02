@@ -209,7 +209,7 @@ namespace ILib.MVVM.StaticVM
 				w.WriteLine("add");
 				using (w.Bracket())
 				{
-					w.WriteLine($"SubscribeViewEvent{genericType}(\"{viewEvent.Name}\", value);");
+					w.WriteLine($"m_Event.Subscribe{genericType}(\"{viewEvent.Name}\", value);");
 				}
 			});
 			property.Setter = new DelegateEmitter(w =>
@@ -217,7 +217,7 @@ namespace ILib.MVVM.StaticVM
 				w.WriteLine("remove");
 				using (w.Bracket())
 				{
-					w.WriteLine($"UnsubscribeViewEvent{genericType}(\"{viewEvent.Name}\", value);");
+					w.WriteLine($"m_Event.Unsubscribe{genericType}(\"{viewEvent.Name}\", value);");
 				}
 			});
 			ret.Add(property);

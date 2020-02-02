@@ -33,6 +33,12 @@ namespace ILib.MVVM
 		{
 			return m_Aargument?.GetEventType() ?? null;
 		}
+
+		public override EventArgument GetArgument()
+		{
+			return m_Aargument;
+		}
+
 	}
 
 }

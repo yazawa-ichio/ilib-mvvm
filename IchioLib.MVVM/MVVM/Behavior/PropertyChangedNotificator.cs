@@ -6,30 +6,15 @@ using Object = UnityEngine.Object;
 
 namespace ILib.MVVM.Behaviors
 {
-	public class PropertyChangedNotificator : IBindable
+	public class PropertyChangedNotificator : IBindable, IDisposable
 	{
 		IBindingProperty m_Property;
 		public string Path { get; private set; }
-		public bool IsActive => m_ActiveCheck();
-		public
+		public bool IsActive => m_ActiveCheck?.Invoke() ?? false;
+		public object Value => m_Property != null ? m_Property.GetValue<object>() : null;
 		int m_Hash;
 		Func<bool> m_ActiveCheck;
 		public event Action OnChanged;
-
-		public PropertyChangedNotificator(string path, object owner)
-		{
-			Path = path;
-			var reference = new WeakReference<object>(owner);
-			m_ActiveCheck = () =>
-			{
-				object obj;
-				if (reference.TryGetTarget(out obj) && obj != null)
-				{
-					return true;
-				}
-				return false;
-			};
-		}
 
 		public PropertyChangedNotificator(string path, Object owner)
 		{
@@ -45,7 +30,7 @@ namespace ILib.MVVM.Behaviors
 
 		public Type BindType()
 		{
-			return typeof(object);
+			return null;
 		}
 
 		void IBindable.Bind(IBindingProperty prop)
@@ -66,33 +51,28 @@ namespace ILib.MVVM.Behaviors
 			return;
 		}
 
+		public IConverter GetConverter()
+		{
+			return null;
+		}
+
+		public void Dispose()
+		{
+			m_ActiveCheck = null;
+		}
 	}
 
 
-	public class PropertyChangedNotificator<T> : IBindable<T>
+	public class PropertyChangedNotificator<T> : IBindable<T>, IDisposable
 	{
 		IBindingProperty<T> m_Property;
 		public string Path { get; private set; }
-		public bool IsActive => m_ActiveCheck();
+		public bool IsActive => m_ActiveCheck?.Invoke() ??  false;
+		public T Value => m_Property != null ? m_Property.Value : default;
 		public
 		int m_Hash;
 		Func<bool> m_ActiveCheck;
 		public event Action<T> OnChanged;
-
-		public PropertyChangedNotificator(string path, object owner)
-		{
-			Path = path;
-			var reference = new WeakReference<object>(owner);
-			m_ActiveCheck = () =>
-			{
-				object obj;
-				if (reference.TryGetTarget(out obj) && obj != null)
-				{
-					return true;
-				}
-				return false;
-			};
-		}
 
 		public PropertyChangedNotificator(string path, Object owner)
 		{
@@ -111,16 +91,11 @@ namespace ILib.MVVM.Behaviors
 			return typeof(T);
 		}
 
-		void IBindable<T>.Bind(IBindingProperty<T> prop)
-		{
-			m_Property = prop;
-		}
-
 		void IBindable.Bind(IBindingProperty prop)
 		{
-			if (prop is IBindingProperty<T>)
+			if (prop is IBindingProperty<T> ret)
 			{
-				m_Property = (IBindingProperty<T>)prop;
+				m_Property = ret;
 			}
 		}
 
@@ -138,6 +113,16 @@ namespace ILib.MVVM.Behaviors
 			m_Hash = m_Property.Hash;
 			OnChanged?.Invoke(m_Property.Value);
 			return;
+		}
+
+		public IConverter GetConverter()
+		{
+			return null;
+		}
+
+		public void Dispose()
+		{
+			m_ActiveCheck = null;
 		}
 
 	}

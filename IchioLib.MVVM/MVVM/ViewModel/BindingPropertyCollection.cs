@@ -1,93 +1,63 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 
 namespace ILib.MVVM
 {
 
-	public class BindingPropertyCollection 
+	public delegate void NewBindingPropertyDelegate(string path, IBindingProperty property);
+
+	public class BindingPropertyCollection
 	{
+
 		Dictionary<string, BindingProperty> m_Properties = new Dictionary<string, BindingProperty>();
 
-		public T Get<T>(string path)
+		public event NewBindingPropertyDelegate OnNewProperty;
+
+		public void Subscribe<T>(string path, Action<T> notify)
 		{
-			BindingProperty<T> property = GetProperty<T>(path);
-			return property != null && property.IsValid ? property.Value : default;
+			Get<T>(path).OnChanged += notify;
 		}
 
-		public bool Set<T>(string path, T val, out IBindingProperty<T> newProperty)
+		public void Unsubscribe<T>(string path, Action<T> notify)
 		{
-			BindingProperty<T> property = GetProperty<T>(path);
-			if (property != null)
-			{
-				property.Value = val;
-				if (!property.IsValid)
-				{
-					property.IsValid = true;
-					newProperty = property;
-					return true;
-				}
-				newProperty = null;
-				return false;
-			}
-			else
-			{
-				newProperty = SetNewPropety(path, val, true);
-				return true;
-			}
+			Get<T>(path).OnChanged -= notify;
 		}
 
-		public void Subscribe<T>(string path, System.Action<T> notify)
+		public IBindingProperty<T> Get<T>(string path)
 		{
-			var prop = GetProperty<T>(path);
-			if (prop == null)
+			if (m_Properties.TryGetValue(path, out BindingProperty property))
 			{
-				prop = SetNewPropety(path, default(T), false);
-			}
-			prop.OnChanged += notify;
-		}
-
-		public void Unsubscribe<T>(string path, System.Action<T> notify)
-		{
-			var prop = GetProperty<T>(path);
-			if (prop != null)
-			{
-				prop.OnChanged -= notify;
-			}
-		}
-
-		BindingProperty<T> GetProperty<T>(string path)
-		{
-			BindingProperty property;
-			if (m_Properties.TryGetValue(path, out property))
-			{
+				var last = property;
 				while (property != null)
 				{
-					var ret = property as BindingProperty<T>;
-					if (ret != null) return ret;
+					if (property is BindingProperty<T> ret)
+					{
+						//データがすでにある
+						return ret;
+					}
+					last = property;
 					property = property.Next;
 				}
-			}
-			return null;
-		}
-
-		BindingProperty<T> SetNewPropety<T>(string path, T val, bool isValid)
-		{
-			BindingProperty property;
-			if (!m_Properties.TryGetValue(path, out property))
-			{
-				m_Properties[path] = property = new BindingProperty<T>(path, val);
+				{
+					var ret = NewProperty<T>(path);
+					last.Next = ret;
+					return ret;
+				}
 			}
 			else
 			{
-				while (property.Next != null)
-				{
-					property = property.Next;
-				}
-				property.Next = new BindingProperty<T>(path, val);
-				property = property.Next;
+				var ret = NewProperty<T>(path);
+				m_Properties[path] = ret;
+				return ret;
 			}
-			property.IsValid = isValid;
-			return property as BindingProperty<T>;
+		}
+
+		BindingProperty<T> NewProperty<T>(string path)
+		{
+			var ret = new BindingProperty<T>(path);
+			OnNewProperty?.Invoke(path, ret);
+			return ret;
 		}
 
 		public void SetDirty(string path)
@@ -97,10 +67,7 @@ namespace ILib.MVVM
 			{
 				while (property != null)
 				{
-					if (property.IsValid)
-					{
-						property.SetDirty();
-					}
+					property.SetDirty();
 					property = property.Next;
 				}
 			}
@@ -113,50 +80,24 @@ namespace ILib.MVVM
 				var property = _property;
 				while (property != null)
 				{
-					if (property.IsValid)
-					{
-						property.SetDirty();
-					}
+					property.SetDirty();
 					property = property.Next;
 				}
 			}
 		}
 
-		public void Bind(IBinding binding)
+		public IEnumerable<IBindingProperty> GetAll()
 		{
 			foreach (var _property in m_Properties.Values)
 			{
 				var property = _property;
 				while (property != null)
 				{
-					if (property.IsValid)
-					{
-						binding.Bind(property.Path, property);
-					}
+					yield return _property;
 					property = property.Next;
 				}
 			}
 		}
-
-		public void Unbind(IBinding binding)
-		{
-			foreach (var _property in m_Properties.Values)
-			{
-				var property = _property;
-				while (property != null)
-				{
-					if (property.IsValid)
-					{
-						binding.Unbind(property.Path, property);
-					}
-					property = property.Next;
-				}
-			}
-		}
-
-#if UNITY_EDITOR
-		public IEnumerable<IBindingProperty> GetAll() => m_Properties.Values;
-#endif
 
 	}
 

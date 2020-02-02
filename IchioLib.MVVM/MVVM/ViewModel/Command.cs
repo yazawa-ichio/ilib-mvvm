@@ -15,6 +15,12 @@
 
 		void ICommand.Execute() => m_Action?.Invoke();
 
+		public override string ToString()
+		{
+			if (m_Action == null) return $"DelegateCommand:Empty";
+			return m_Action.Method + "(" + m_Action.Target + ")";
+		}
+
 	}
 
 	public class DelegateCommand<T> : ICommand<T>
@@ -31,6 +37,13 @@
 		}
 
 		void ICommand<T>.Execute(T args) => m_Action?.Invoke(args);
+
+		public override string ToString()
+		{
+			if (m_Action == null) return $"DelegateCommand<{typeof(T).Name}>:Empty";
+			return m_Action.Method + "(" + m_Action.Target + ")";
+		}
+
 	}
 
 }
