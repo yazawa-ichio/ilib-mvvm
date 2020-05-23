@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -86,9 +85,12 @@ namespace ILib.MVVM
 		{
 			if (m_Disposed) return;
 			m_ViewModels.Add(model);
-			foreach (var prop in model.Property.GetAll())
+			using (var scope = ViewUtil.UseBindingPropertyListStack())
 			{
-				Bind(prop.Path, prop);
+				foreach (var prop in model.Property.GetAll(scope.List))
+				{
+					Bind(prop.Path, prop);
+				}
 			}
 			model.Property.OnNewProperty += Bind;
 		}
@@ -97,9 +99,12 @@ namespace ILib.MVVM
 		{
 			if (m_Disposed) return;
 			m_ViewModels.Remove(model);
-			foreach (var prop in model.Property.GetAll())
+			using (var scope = ViewUtil.UseBindingPropertyListStack())
 			{
-				Unbind(prop.Path, prop);
+				foreach (var prop in model.Property.GetAll(scope.List))
+				{
+					Unbind(prop.Path, prop);
+				}
 			}
 			model.Property.OnNewProperty -= Bind;
 		}

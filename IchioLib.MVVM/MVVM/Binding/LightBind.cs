@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using Object = UnityEngine.Object;
 
@@ -10,6 +8,7 @@ namespace ILib.MVVM
 	public interface ILightBind
 	{
 		void Init(Object obj, string path);
+		bool OnReturn();
 	}
 
 	[UnityEngine.Scripting.Preserve]
@@ -52,6 +51,17 @@ namespace ILib.MVVM
 			m_Converter = (m_Target as Component)?.GetComponent<IConverter>() ?? null;
 			Path = path;
 			OnInit();
+		}
+
+		public virtual bool OnReturn()
+		{
+			Path = default;
+			m_Property = default;
+			m_Target = default;
+			m_Hash = default;
+			m_ForceUpdate = default;
+			m_Converter = default;
+			return true;
 		}
 
 		public IConverter GetConverter()
@@ -121,6 +131,12 @@ namespace ILib.MVVM
 		void IViewEvent.Bind(IViewEventDispatcher handler)
 		{
 			m_Handler = handler;
+		}
+
+		public override bool OnReturn()
+		{
+			m_Handler = null;
+			return base.OnReturn();
 		}
 
 		public virtual Type EventType()

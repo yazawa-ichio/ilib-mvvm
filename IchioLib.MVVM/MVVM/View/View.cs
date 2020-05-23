@@ -1,6 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System.Collections.Generic;
 using UnityEngine;
 
 namespace ILib.MVVM
@@ -16,21 +14,31 @@ namespace ILib.MVVM
 
 		IViewModel m_ViewModel;
 		Binding m_Binding = new Binding();
-		IViewElement[] m_Elements;
-		IViewElement[] IView.Elements => m_Elements;
+		internal IViewElement[] m_Elements;
+		bool IView.IsActive => IsActive;
+		bool m_IsActive = true;
+		protected bool IsActive => m_IsActive && gameObject != null && this != null;
 
 		public IViewModel DataContext => m_ViewModel;
 
+		IViewElement[] IView.Elements => m_Elements;
+
 		private void Awake()
 		{
+			ViewUpdater.Register(this);
 			Prepare();
 			Init();
 		}
 
 		private void OnDestroy()
 		{
+			m_IsActive = false;
 			m_Binding?.Dispose();
 			m_Binding = null;
+			foreach (var lightBind in m_LightBinds)
+			{
+				lightBind.Dispose();
+			}
 			OnDestroyImpl();
 		}
 
@@ -38,29 +46,40 @@ namespace ILib.MVVM
 		{
 			if (m_Prepare && !force) return;
 			m_Prepare = true;
-			List<IViewElement> elements = new List<IViewElement>();
-			GetComponentsInChildren(true, elements);
-			if (m_LightBinds != null)
-			{
-				elements.AddRange(m_LightBinds.Select(x => x.Resolve()));
-			}
-			foreach (var view in GetComponentsInChildren<IView>(true))
-			{
-				var viewComponent = view as View;
-				if (viewComponent == this) continue;
-				view.Prepare();
-				if (view.Elements == null) continue;
-				foreach (var remove in view.Elements)
-				{
-					elements.Remove(remove);
-				}
-			}
-			m_Elements = elements.ToArray();
-		}
 
-		private void Update()
-		{
-			TryUpdate();
+			using (var elementsScope = ViewUtil.UseElementList())
+			{
+				var elements = elementsScope.List;
+				GetComponentsInChildren(true, elements);
+				if (m_LightBinds != null)
+				{
+					foreach (var lightBind in m_LightBinds)
+					{
+						elements.Add(lightBind.Resolve());
+					}
+				}
+				using (var viewListScope = ViewUtil.UseViewList())
+				{
+					var viewList = viewListScope.List;
+					GetComponentsInChildren(true, viewList);
+					foreach (var view in viewList)
+					{
+						var viewComponent = view as View;
+						if (viewComponent == this) continue;
+						view.Prepare();
+						using (var childElementsScope = ViewUtil.UseElementList())
+						{
+							var childElements = childElementsScope.List;
+							view.GetElements(childElements);
+							foreach (var remove in childElements)
+							{
+								elements.Remove(remove);
+							}
+						}
+					}
+				}
+				m_Elements = elements.ToArray();
+			}
 		}
 
 		protected virtual void OnDestroyImpl() { }
@@ -91,6 +110,19 @@ namespace ILib.MVVM
 			}
 			m_ViewModel = vm;
 			m_Binding.Bind(vm);
+		}
+
+		public void GetElements(List<IViewElement> elements)
+		{
+			if (!m_Prepare)
+			{
+				Prepare();
+			}
+			if (m_Elements == null) return;
+			foreach (var element in m_Elements)
+			{
+				elements.Add(element);
+			}
 		}
 
 	}

@@ -18,4 +18,3 @@ namespace ILib.MVVM.Message
 		bool IsSame(object recipient, Action<T> action);
 	}
 }
-

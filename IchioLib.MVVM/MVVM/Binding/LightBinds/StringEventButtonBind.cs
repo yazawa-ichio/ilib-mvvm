@@ -7,6 +7,7 @@ namespace ILib.MVVM
 		string m_Val;
 		protected override void OnInit()
 		{
+			m_Val = default;
 			m_Target.onClick.AddListener(OnClick);
 		}
 		void OnClick()

@@ -1,5 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 namespace ILib.MVVM
 {
 
@@ -62,7 +61,7 @@ namespace ILib.MVVM
 		{
 			Subscribe(EventKeyToStrConv.ToStr(name), onViewEvent);
 		}
-		
+
 		public void Subscribe<T>(object name, System.Action<T> onViewEvent)
 		{
 			Subscribe(EventKeyToStrConv.ToStr(name), onViewEvent);

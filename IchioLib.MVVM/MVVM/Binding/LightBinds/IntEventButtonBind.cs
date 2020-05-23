@@ -1,5 +1,4 @@
-﻿using System;
-using UnityEngine.UI;
+﻿using UnityEngine.UI;
 
 namespace ILib.MVVM
 {
@@ -8,6 +7,7 @@ namespace ILib.MVVM
 		int m_Val;
 		protected override void OnInit()
 		{
+			m_Val = default;
 			m_Target.onClick.AddListener(OnClick);
 		}
 		void OnClick()

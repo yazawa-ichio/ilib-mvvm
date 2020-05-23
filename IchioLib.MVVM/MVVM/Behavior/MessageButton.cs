@@ -7,7 +7,7 @@ namespace ILib.MVVM
 {
 	public class MessageButton : Behavior
 	{
-		[SerializeField, EventName]
+		[SerializeField, EventNameDraw]
 		string m_Event = default;
 		[SerializeField]
 		Button m_Button = default;
@@ -25,14 +25,14 @@ namespace ILib.MVVM
 
 		protected virtual void OnClick()
 		{
-			if (m_Messanger == null) return;
+			if (m_Messenger == null) return;
 			if (m_Aargument != null)
 			{
-				m_Aargument.Do(m_Event, m_Messanger);
+				m_Aargument.Do(m_Event, m_Messenger);
 			}
 			else
 			{
-				m_Messanger?.Send(m_Event);
+				m_Messenger?.Send(m_Event);
 			}
 		}
 

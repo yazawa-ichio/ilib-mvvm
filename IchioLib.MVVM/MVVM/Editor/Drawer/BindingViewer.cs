@@ -1,9 +1,6 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using System.Collections.Generic;
 using UnityEditor;
-using System.Linq;
-using System.Reflection;
+using UnityEngine;
 
 namespace ILib.MVVM.Drawer
 {
@@ -95,7 +92,7 @@ namespace ILib.MVVM.Drawer
 			m_ElementNames = new string[m_ElementViewers.Count];
 
 		}
-		
+
 
 		public void Draw()
 		{
@@ -213,9 +210,12 @@ namespace ILib.MVVM.Drawer
 			{
 				EditorGUILayout.LabelField("Property Path(Type)", "Value");
 				GUILayout.Box("", GUILayout.ExpandWidth(true), GUILayout.Height(1));
-				foreach (var prop in vm.Property.GetAll())
+				using (var scope = ViewUtil.UseBindingPropertyListStack())
 				{
-					EditorGUILayout.LabelField($"{prop.Path}({prop.GetBindType().Name})", prop.ToString());
+					foreach (var prop in vm.Property.GetAll(scope.List))
+					{
+						EditorGUILayout.LabelField($"{prop.Path}({prop.GetBindType().Name})", prop.ToString());
+					}
 				}
 			}
 

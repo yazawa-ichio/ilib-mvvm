@@ -40,7 +40,7 @@ namespace ILib.MVVM.Message
 		}
 
 		[UnityEngine.Scripting.Preserve]
-		public static ReferenceHandle Register(Messenger messenger, object target, MessageHandleAttribute attr, bool weakreference)
+		public static ReferenceHandle Register(MessengerImpl messenger, object target, MessageHandleAttribute attr, bool weakreference)
 		{
 			var action = (Action)Delegate.CreateDelegate(typeof(Action), target, attr.m_Method);
 			if (!weakreference)
@@ -96,7 +96,7 @@ namespace ILib.MVVM.Message
 		}
 
 		[UnityEngine.Scripting.Preserve]
-		public static ReferenceHandle Register(Messenger messenger, object target, MessageHandleAttribute attr, bool weakreference)
+		public static ReferenceHandle Register(MessengerImpl messenger, object target, MessageHandleAttribute attr, bool weakreference)
 		{
 			var action = (Action<T>)Delegate.CreateDelegate(typeof(Action<T>), target, attr.m_Method);
 			if (!weakreference)
@@ -114,4 +114,3 @@ namespace ILib.MVVM.Message
 
 
 }
-

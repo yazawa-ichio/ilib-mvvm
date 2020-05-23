@@ -13,11 +13,25 @@ namespace ILib.MVVM.Drawer
 
 		static LightBindUtil()
 		{
-			var field = typeof(LightBindEntry).GetField("s_Dic", System.Reflection.BindingFlags.Static | System.Reflection.BindingFlags.NonPublic);
-			var entries = (field.GetValue(null) as Dictionary<string, LightBindEntry>).Values.ToArray();
+			var entries = GetEntries().ToArray();
 			DispNames = Enumerable.Concat(new string[] { "None" }, entries.Select(x => x.Type.Name)).ToArray();
 			TypeNames = Enumerable.Concat(new string[] { "" }, entries.Select(x => x.TypeName)).ToArray();
 			TargetTypes = Enumerable.Concat(new System.Type[] { typeof(Object) }, entries.Select(x => GetTragetType(x.Type))).ToArray();
+		}
+
+		static IEnumerable<LightBindEntry> GetEntries()
+		{
+			foreach (var assemblie in System.AppDomain.CurrentDomain.GetAssemblies())
+			{
+				foreach (var type in assemblie.GetTypes())
+				{
+					if (type.IsAbstract) continue;
+					if (typeof(ILightBind).IsAssignableFrom(type) && typeof(IBindable).IsAssignableFrom(type))
+					{
+						yield return LightBindEntry.GetEntry(LightBindEntry.GetKey(type));
+					}
+				}
+			}
 		}
 
 		static System.Type GetTragetType(System.Type type)

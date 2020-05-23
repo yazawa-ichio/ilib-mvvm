@@ -12,6 +12,13 @@ namespace ILib.MVVM
 			m_Target.onClick.AddListener(OnClick);
 			m_Aargument = m_Target.GetComponent<EventArgument>();
 		}
+
+		public override bool OnReturn()
+		{
+			m_Aargument = default;
+			return base.OnReturn();
+		}
+
 		void OnClick()
 		{
 			if (m_Aargument != null)

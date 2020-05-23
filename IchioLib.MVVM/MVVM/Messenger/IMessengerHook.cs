@@ -8,4 +8,3 @@
 		void OnSend<TEventName, UMessage>(TEventName name, UMessage args);
 	}
 }
-

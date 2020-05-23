@@ -1,7 +1,5 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
-using System.Linq;
 
 namespace ILib.MVVM
 {
@@ -35,14 +33,23 @@ namespace ILib.MVVM
 			var view = instance.GetComponent<IView>();
 			view.Prepare();
 			view.Attach(vm);
-			foreach (var argument in view.Elements.OfType<IViewEvent>().Select(x => x.GetArgument()))
+
+			using (var elementsScope = ViewUtil.UseElementList())
 			{
-				if (argument != null && argument is CollectionIndexArgument target)
+				var elements = elementsScope.List;
+				view.GetElements(elements);
+				foreach (var elm in elements)
 				{
-					target.Index = index;
+					if (elm is IViewEvent viewEvent)
+					{
+						var argument = viewEvent.GetArgument();
+						if (argument != null && argument is CollectionIndexArgument target)
+						{
+							target.Index = index;
+						}
+					}
 				}
 			}
 		}
-
 	}
 }

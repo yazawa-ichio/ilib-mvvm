@@ -67,7 +67,7 @@ namespace ILib.MVVM.Behaviors
 	{
 		IBindingProperty<T> m_Property;
 		public string Path { get; private set; }
-		public bool IsActive => m_ActiveCheck?.Invoke() ??  false;
+		public bool IsActive => m_ActiveCheck?.Invoke() ?? false;
 		public T Value => m_Property != null ? m_Property.Value : default;
 		public
 		int m_Hash;

@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 
 namespace ILib.MVVM
@@ -86,17 +85,18 @@ namespace ILib.MVVM
 			}
 		}
 
-		public IEnumerable<IBindingProperty> GetAll()
+		public List<IBindingProperty> GetAll(List<IBindingProperty> ret)
 		{
 			foreach (var _property in m_Properties.Values)
 			{
 				var property = _property;
 				while (property != null)
 				{
-					yield return _property;
+					ret.Add(property);
 					property = property.Next;
 				}
 			}
+			return ret;
 		}
 
 	}

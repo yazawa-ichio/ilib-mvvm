@@ -5,7 +5,7 @@ namespace ILib.MVVM
 {
 	using Message;
 
-	internal delegate ReferenceHandle RegisterDelegate(Messenger messenger, object target, MessageHandleAttribute attribute, bool weakreference);
+	internal delegate ReferenceHandle RegisterDelegate(MessengerImpl messenger, object target, MessageHandleAttribute attribute, bool weakreference);
 
 	[AttributeUsage(AttributeTargets.Method)]
 	public class MessageHandleAttribute : Attribute
@@ -26,7 +26,7 @@ namespace ILib.MVVM
 			MessageHandleUtil.GetAttributes(type);
 		}
 
-		internal static ReferenceHandle Register(Messenger messenger, object target, bool weakreference)
+		internal static ReferenceHandle Register(MessengerImpl messenger, object target, bool weakreference)
 		{
 			var attrs = MessageHandleUtil.GetAttributes(target.GetType());
 			var handles = new ReferenceHandle[attrs.Length];
@@ -40,4 +40,3 @@ namespace ILib.MVVM
 
 	}
 }
-

@@ -1,9 +1,6 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
-
-//using ILib.CodeEmit;
+﻿//using ILib.CodeEmit;
 using ILib.MVVM.CodeEmit;
+using System.Collections.Generic;
 
 namespace ILib.MVVM.StaticVM
 {
@@ -46,8 +43,9 @@ namespace ILib.MVVM.StaticVM
 			m_View.Prepare(true);
 
 			HashSet<string> path = new HashSet<string>();
-
-			foreach (var elm in m_View.Elements)
+			List<IViewElement> elements = new List<IViewElement>();
+			m_View.GetElements(elements);
+			foreach (var elm in elements)
 			{
 				if (elm is EventButton)
 				{
@@ -138,7 +136,7 @@ namespace ILib.MVVM.StaticVM
 			LazyPropertyEmitter property = new LazyPropertyEmitter();
 			string name = bindable.Path.Replace("/", "").Replace(".", "");
 			if (bindable is IViewEvent) name += m_Config.EventValueSuffix;
-			
+
 			property.Name = name;
 			property.Summary = $"BindingPath : {bindable.Path}\nTarget: {bindable.ToString()}";
 

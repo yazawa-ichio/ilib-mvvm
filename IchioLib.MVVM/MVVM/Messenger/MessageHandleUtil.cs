@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Reflection;
 using System.Linq;
+using System.Reflection;
 
 namespace ILib.MVVM.Message
 {
@@ -13,10 +13,9 @@ namespace ILib.MVVM.Message
 
 		public static MessageHandleAttribute[] GetAttributes(Type type)
 		{
-			MessageHandleAttribute[] ret = null;
-			if (!s_Cache.TryGetValue(type, out ret))
+			if (!s_Cache.TryGetValue(type, out var ret))
 			{
-				ret = GetAttributesImpl(type).ToArray();
+				ret = s_Cache[type] = GetAttributesImpl(type).ToArray();
 			}
 			return ret;
 		}
@@ -72,4 +71,3 @@ namespace ILib.MVVM.Message
 
 	}
 }
-

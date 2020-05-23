@@ -1,6 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 
 namespace ILib.MVVM
 {
@@ -8,7 +6,7 @@ namespace ILib.MVVM
 	{
 		public abstract System.Type GetEventType();
 		public abstract void Do(string name, IViewEventDispatcher handler);
-		public abstract void Do(string name, Messenger messenger);
+		public abstract void Do(string name, IMessenger messenger);
 	}
 
 	public abstract class EventArgument<T> : EventArgument
@@ -19,12 +17,12 @@ namespace ILib.MVVM
 
 		public override void Do(string name, IViewEventDispatcher handler)
 		{
-			handler?.Dispatch<T>(name, GetValue());
+			handler?.Dispatch(name, GetValue());
 		}
 
-		public override void Do(string name, Messenger messenger)
+		public override void Do(string name, IMessenger messenger)
 		{
-			messenger?.Send<T>(name, GetValue());
+			messenger?.Send(name, GetValue());
 		}
 
 	}

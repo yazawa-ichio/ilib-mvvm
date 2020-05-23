@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -11,17 +10,17 @@ namespace ILib.MVVM
 	{
 
 		[SerializeField]
-		string m_MessangerPath = ViewModelBase.MessengerPath;
+		string m_MessengerPath = ViewModelBase.MessengerPath;
 
-		public string MessangerPath => m_MessangerPath;
+		public string MessengerPath => m_MessengerPath;
 
-		protected Messenger m_Messanger = Messenger.Default;
-		Messenger IBehavior.Messanger => m_Messanger;
-		Action<Messenger> m_OnSetMessanger = null;
+		protected IMessenger m_Messenger = Messenger.Default;
+		IMessenger IBehavior.Messenger => m_Messenger;
+		Action<IMessenger> m_OnSetMessenger = null;
 
 		void OnDestroy()
 		{
-			m_Messanger?.Unregister(this);
+			m_Messenger?.Unregister(this);
 			OnDestroyImpl();
 		}
 
@@ -29,25 +28,25 @@ namespace ILib.MVVM
 
 		protected void Register<T>(string name, Action<T> action)
 		{
-			if (m_Messanger != null)
+			if (m_Messenger != null)
 			{
-				m_Messanger.Register(this, name, action);
+				m_Messenger.Register(this, name, action);
 			}
-			m_OnSetMessanger += (msg) => msg.Register(this, name, action);
+			m_OnSetMessenger += (msg) => msg.Register(this, name, action);
 		}
 
-		internal void SetMessanger(Messenger messenger)
+		internal void SetMessenger(IMessenger messenger)
 		{
-			m_Messanger?.Unregister(this);
-			m_Messanger = messenger;
-			m_OnSetMessanger?.Invoke(messenger);
+			m_Messenger?.Unregister(this);
+			m_Messenger = messenger;
+			m_OnSetMessenger?.Invoke(messenger);
 		}
 
 		void IMultipleBindable.OnPrepare() => OnPrepare();
 
 		protected virtual void OnPrepare()
 		{
-			
+
 		}
 
 		protected virtual IEnumerable<IBindable> GetBindables()
@@ -57,7 +56,7 @@ namespace ILib.MVVM
 
 		IEnumerable<IBindable> IMultipleBindable.GetBindables()
 		{
-			yield return new MessangerBind(this, m_MessangerPath);
+			yield return new MessengerBind(this, m_MessengerPath);
 			foreach (var bind in GetBindables())
 			{
 				if (bind != null)

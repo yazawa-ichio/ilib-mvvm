@@ -69,7 +69,7 @@ namespace ILib.MVVM.Message
 			{
 				Removed = true;
 			}
-		} 
+		}
 
 		public bool IsSame(object obj, string eventName, Action<T> target)
 		{
@@ -97,4 +97,3 @@ namespace ILib.MVVM.Message
 	}
 
 }
-

@@ -5,7 +5,7 @@ using UnityEditor;
 
 namespace ILib.MVVM.Drawer
 {
-	[CustomEditor(typeof(View), editorForChildClasses:true)]
+	[CustomEditor(typeof(View), editorForChildClasses: true)]
 	public class ViewDrawer : Editor
 	{
 		static Dictionary<int, BindingViewer> m_Viewers = new Dictionary<int, BindingViewer>();
@@ -26,12 +26,12 @@ namespace ILib.MVVM.Drawer
 				}
 			}
 			m_BindingViewer.Setup(target as View);
-			m_Viewers[view.GetInstanceID()] = m_BindingViewer; 
+			m_Viewers[view.GetInstanceID()] = m_BindingViewer;
 		}
 
 		private void OnDisable()
 		{
-			 
+
 		}
 
 		public override void OnInspectorGUI()

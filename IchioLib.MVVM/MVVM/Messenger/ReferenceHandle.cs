@@ -58,4 +58,3 @@ namespace ILib.MVVM.Message
 	}
 
 }
-

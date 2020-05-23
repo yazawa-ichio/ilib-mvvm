@@ -1,11 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-
-namespace ILib.MVVM
+﻿namespace ILib.MVVM
 {
 	public abstract class ViewModelBase : IViewModel
 	{
-		public const string MessengerPath = "Messanger";
+		public const string MessengerPath = "Messenger";
 
 		protected BindingPropertyCollection m_Properties = new BindingPropertyCollection();
 
@@ -15,9 +12,9 @@ namespace ILib.MVVM
 
 		public EventBroker Event => m_Event;
 
-		public Messenger Messenger
+		public IMessenger Messenger
 		{
-			get { return GetImpl<Messenger>(MessengerPath) ?? ILib.MVVM.Messenger.Default; }
+			get { return GetImpl<IMessenger>(MessengerPath) ?? ILib.MVVM.Messenger.Default; }
 			set { SetImpl(MessengerPath, value); }
 		}
 

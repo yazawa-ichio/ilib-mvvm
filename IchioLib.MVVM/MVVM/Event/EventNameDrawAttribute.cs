@@ -2,7 +2,6 @@
 using UnityEditor;
 #endif
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using System.Linq;
@@ -10,13 +9,18 @@ using System.Linq;
 namespace ILib.MVVM
 {
 	[AttributeUsage(AttributeTargets.Field)]
-	public class EventNameAttribute : PropertyAttribute
+	public class EventNameDrawAttribute : PropertyAttribute
+	{
+	}
+
+	[AttributeUsage(AttributeTargets.Field), Obsolete("use EventNameDrawAttribute")]
+	public class EventNameAttribute : EventNameDrawAttribute
 	{
 	}
 
 #if UNITY_EDITOR
 
-	[CustomPropertyDrawer(typeof(EventNameAttribute))]
+	[CustomPropertyDrawer(typeof(EventNameDrawAttribute))]
 	class EventNameDrawer : PropertyDrawer
 	{
 		static string[] s_Keys;

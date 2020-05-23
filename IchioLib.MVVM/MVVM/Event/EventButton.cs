@@ -10,7 +10,7 @@ namespace ILib.MVVM
 	{
 		public string Name => m_Event;
 
-		[SerializeField, EventName]
+		[SerializeField, EventNameDraw]
 		string m_Event = default;
 		[SerializeField]
 		Button m_Button = default;

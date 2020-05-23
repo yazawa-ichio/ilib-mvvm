@@ -55,7 +55,7 @@ namespace ILib.MVVM.CodeEmit
 			}
 
 			writer.AppendLine("");
-			
+
 			if (!string.IsNullOrEmpty(Namespace))
 			{
 				writer.AppendLine($"namespace {Namespace}");

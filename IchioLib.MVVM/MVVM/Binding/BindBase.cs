@@ -17,7 +17,7 @@ namespace ILib.MVVM
 		protected int m_Hash;
 		protected bool m_ForceUpdate;
 		IConverter m_Converter;
-		bool m_CheckConverter ;
+		bool m_CheckConverter;
 
 		protected void Set(T val)
 		{
