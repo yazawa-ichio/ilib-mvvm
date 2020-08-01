@@ -8,11 +8,22 @@ namespace ILib.MVVM
 	{
 		[SerializeField]
 		GameObject m_Preafb = null;
+		[SerializeField]
+		bool m_DisableAutoActive = false;
 
 		List<GameObject> m_Instance = new List<GameObject>();
 
 		protected override void UpdateValue(IList<IViewModel> val)
 		{
+			// 破棄済みを削除
+			for (int i = m_Instance.Count - 1; i >= 0; i--)
+			{
+				if (m_Instance[i] == null)
+				{
+					m_Instance.RemoveAt(i);
+				}
+			}
+			// 多い分を削除
 			for (int i = m_Instance.Count - 1; i >= val.Count; i--)
 			{
 				GameObject.Destroy(m_Instance[i]);
@@ -33,6 +44,11 @@ namespace ILib.MVVM
 			var view = instance.GetComponent<IView>();
 			view.Prepare();
 			view.Attach(vm);
+
+			if (!instance.activeSelf && !m_DisableAutoActive)
+			{
+				instance.SetActive(true);
+			}
 
 			using (var elementsScope = ViewUtil.UseElementList())
 			{

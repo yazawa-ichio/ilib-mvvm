@@ -7,16 +7,16 @@ namespace ILib.MVVM
 	public static class ViewUpdater
 	{
 		static List<IView> s_Views = new List<IView>();
-		static Predicate<IView> s_CheckActive;
+		static Predicate<IView> s_CheckRemove;
 
 		static ViewUpdater()
 		{
-			ViewUpdaterInstance.TryInit();
-			s_CheckActive = (x) => x.IsActive;
+			s_CheckRemove = (x) => !x.IsActive;
 		}
 
 		public static void Register(IView view)
 		{
+			ViewUpdaterInstance.TryInit();
 			s_Views.Add(view);
 		}
 
@@ -37,7 +37,7 @@ namespace ILib.MVVM
 			}
 			if (remove)
 			{
-				s_Views.RemoveAll(s_CheckActive);
+				s_Views.RemoveAll(s_CheckRemove);
 			}
 		}
 
