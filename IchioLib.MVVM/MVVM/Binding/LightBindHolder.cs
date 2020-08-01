@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using Object = UnityEngine.Object;
 
@@ -107,6 +108,9 @@ namespace ILib.MVVM
 			return type.FullName;
 		}
 
+		// キャッシュ
+		static System.Reflection.Assembly[] s_Assemblies = null;
+
 		public static LightBindEntry GetEntry(string key)
 		{
 			LightBindEntry entry;
@@ -114,7 +118,8 @@ namespace ILib.MVVM
 			{
 				return entry;
 			}
-			var type = System.Type.GetType(key);
+			var assemblies = s_Assemblies ?? (s_Assemblies = AppDomain.CurrentDomain.GetAssemblies());
+			var type = assemblies.Select(x => x.GetType(key)).FirstOrDefault(x => x != null);
 			s_Dic[key] = entry = new LightBindEntry();
 			entry.m_Instantiate = () => System.Activator.CreateInstance(type) as ILightBind;
 			entry.Type = type;
