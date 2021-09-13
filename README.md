@@ -1,4 +1,4 @@
-# ilib-mvvm
+# ilib-mvvm(開発停止中)
 Unity MVVM DataBinding Package
 
 UnityでMVVMでデータバインディングを行うためのパッケージです。  
@@ -12,3 +12,8 @@ ViewModelは汎用的に値をセットできるSet/Get関数を利用するも�
 ## [ドキュメント](https://yazawa-ichio.github.io/ilib-unity-project/manual/ilib-mvvm/index.html)
 
 ## [APIリファレンス](https://yazawa-ichio.github.io/ilib-unity-project/api/index.html)
+
+# 移行先
+https://github.com/yazawa-ichio/UVMBinding  
+データバインディングの機能だけが欲しいと自分の中で結論が出たので、その機能だけを持つ別のパッケージに切り出されました。  
+今後、こちらのリポジトリで開発を進める予定です。  
